@@ -67,4 +67,5 @@ async def on_member_join(member):
 #     print (message)
 
 server.server()
+client.run(TOKEN)
 bot.run(TOKEN)
