@@ -10,62 +10,47 @@ load_dotenv()
 bot = commands.Bot(command_prefix="$")
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-intents = discord.Intents.all()
-client = discord.Client(intents=intents)
+# intents = discord.Intents.all()
+# client = discord.Client(intents=intents)
 
-
-@client.event
+@bot.event
 async def on_ready():
-    print(f'{client.user.name} has connected to Discord!')
-    # guild = discord.utils.get(client.guilds, name=GUILD)
-    # members = '\n - '.join([member.name for member in guild.members])
-    # print(f'Guild Members:\n - {members}')
-    # general_channel=client.get_channel(851710538983538721)
-    # await general_channel.send(
-    #     "hello"
-    # )
+    print(f'{bot.user.name} has connected to Discord!')
 
-# text messages and responses
-# chat =  {"greeting":{"message":["hi corvis","hello corvis","hi corvis","corvis"],
-#                      "response":["hi","hello",]},
-#          "wishes":{"message":["happy birthday","good morning"],
-#                    "response":["happy birthday","good moring"]},
-#          "talks1":{"message":["do you know me","do you know about me","you know about me"],
-#                  "response":["yeah,you are a great guy"]},
-#     "talks1":{"message":["tell me something i don't know"],
-#                  "response":["yeah,you are a great guy"]}
-         
-# }
- 
-# @client.event
-# async def on_member_join(member):
-#     if (member.name=="Nishant Ranjan"):
-#         await member.create_dm()
-#         await member.dm_channel.send(
-#         f"Hi {member.name}, muh main lega"
-#         )
-#     else:
-#         await member.create_dm()
-#         await member.dm_channel.send(
-#         f"Hi {member.name}, welcome to PCoder"
-#         )
-@client.event
-async def on_member_join(member):
-    await member.send('Hi {member.name}, welcome to my Discord server!,\n ThankYou for joining. Pranav will contact you shortly ')
-# @client.event
-# async def on_message(message):
-#     if (message.author==client.user):
-#         return
-#     if (message.content=="Hi"):
-#         response= random.choice(greetings)
-#         await message.channel.send(response)
-#     for elements in chat:
-#         for items in chat[elements]['message']:
-#             if (message.content == items):
-#                 response = random.choice(chat[elements]['response'])
-#                 await message.channel.send(response)
-#     print (message)
+class JoinDistance:
+    def __init__(self, joined, created):
+        self.joined = joined
+        self.created = created
+
+    @property
+    def delta(self):
+        print(self.joined)
+        print(self.created)
+        return self.joined - self.created
+
+class JoinDistanceConverter(commands.MemberConverter):
+    async def convert(self, ctx, argument):
+        member = await super().convert(ctx, argument)
+        return JoinDistance(member.joined_at, member.created_at)
+
+@bot.command()
+async def delta(ctx, *, member: JoinDistanceConverter):
+    
+    is_new = member.delta.days < 100
+    if is_new:
+        await ctx.send("Hey you're pretty new!")
+    else:
+        await ctx.send("Hm you're not so new.")
+
+class MemberRoles(commands.MemberConverter):
+    async def convert(self, ctx, argument):
+        member = await super().convert(ctx, argument)
+        return [role.name for role in member.roles[1:]] # Remove everyone role!
+
+@bot.command()
+async def roles(ctx, *, member: MemberRoles):
+    """Tells you a member's roles."""
+    await ctx.send('I see the following roles: ' + ', '.join(member))
 
 server.server()
-client.run(TOKEN)
 bot.run(TOKEN)
