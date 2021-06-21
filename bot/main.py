@@ -56,13 +56,14 @@ wallet  = 200
 @client.command()
 async def bet(ctx, money_bet: int):
     outcome = ["win","loose"]
+#     user = ctx.author
     a = random.choice(outcome)
     if  a == "win" and money_bet < wallet:
         await ctx.send(f"You just won {money_bet}, YAY !")
-        users[str(user.id)]["wallet"] += money_bet
+#         users[str(user.id)]["wallet"] += money_bet
     elif a == "loose" and money_bet < wallet:
         await ctx.send(f"Damn, you just lost {money_bet} !!!")
-        users[str(user.id)]["wallet"] -= money_bet
+#         users[str(user.id)]["wallet"] -= money_bet
     else:
         await ctx.send(f"You don't have enough money in your wallet :/ ")
 
